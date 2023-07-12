@@ -1,0 +1,5 @@
+{% for p in projects %}
+    <!-- maxsize_hack -->
+    {% if loop.first == 0 %}<pagebreak>{% endif %}
+        {% include 'pdf/project.html.twig'  with {'project': p} %}
+    {% endfor %}

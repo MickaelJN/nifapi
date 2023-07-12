@@ -1,0 +1,87 @@
+{% for p in projects %}
+    {% if loop.first == 0 %}<pagebreak>{% endif %}
+        <!-- maxsize_hack -->
+        <div style="color: #94b7bc;font-weight: bold;font-size: 1.4rem;"><tocentry content="{{ ( p.number ~ " - " ~ p.name ~ "<br><span class='tocasso'>" ~ p.organization.name ~ "</span>")|e('html')}}"/>Project n° {{ p.number }}</div>
+        <div style="color: #223457;font-size: 1.1rem;font-weight: bold;padding-bottom: 8px;">{{ p.name }}</div>
+        <hr>
+        <div style="padding: 8px 0;">
+            <div style="padding-bottom: 7px;color: #94b7bc;text-transform: uppercase;font-size: 0.8rem;">Association</div>
+            <div style="color: #223457;font-size: 0.9rem;font-weight: bold;">{{ p.organization.name }}</div>
+            {% if p.organization.website is defined and p.organization.website is not null and p.organization.website != "https://-" and p.organization.website starts with "http"%}
+                <div style="padding-top: 7px;">
+                    <a href="{{ p.organization.website }}" target="_blank" style="color: #223457;margin-top: 10px;display: block;text-decoration: none;">{{ p.organization.website }}</a>
+                </div>
+            {% endif %}
+        </div>
+        <hr>
+        <div style="padding: 8px 0;">
+            <div style="width: 33.33%; float: left; display: inline-block;vertical-align: top">
+                <div style="padding-bottom: 7px;color: #94b7bc;text-transform: uppercase;font-size: 0.8rem;">Allocation totale</div>
+                {% set total = 0 %}
+                {% if p.initialAllocated %}{% set total = total + p.initialAllocated.amount %}{% endif %}
+                {% if p.extensions %}
+                    {% for e in p.extensions %}
+                        {% set total = total + e.amount %}
+                    {% endfor %}
+                {% endif %}
+                <div style="color: #223457;font-size: 13px;font-weight: bold;vertical-align: top">{{ total|number_format(0, '.', ' ') }} €</div>
+            </div>
+            <div style="width: 33.33%; float: left; display: inline-block;vertical-align: top">
+                <div style="padding-bottom: 7px;color: #94b7bc;text-transform: uppercase;font-size: 0.8rem;">Lieu</div>
+                <div style="color: #223457;font-size: 13px;font-weight: bold;vertical-align: top">
+                    {% for c in p.countries %}
+                        {% if loop.first == 0 %}, {% endif %}
+                        {{ c.name }}
+                    {% endfor %}
+                </div>
+            </div>
+            <div style="width: 33.33%; float: left; display: inline-block;vertical-align: top">
+                <div style="padding-bottom: 7px;color: #94b7bc;text-transform: uppercase;font-size: 0.8rem;">Date</div>
+                <div style="color: #223457;font-size: 13px;font-weight: bold;vertical-align: top">{{ p.dateBegin|format_datetime(locale='fr',pattern="MMMM YYYY") }} - {{ p.dateEnd|format_datetime(locale='fr',pattern="MMMM YYYY") }}</div>
+            </div>
+
+        </div>
+        <hr>
+        {% set nb = 0 %}
+        {% if p.photos %}
+            {% for ph in p.photos %}
+                {% if ph.selected and nb < 3 and file_exists(dir ~ "/public/media/cache/my_thumb/uploads/photos/" ~ ph.slug ~ "." ~ ph.extension) %}
+                    {% set nb = nb + 1 %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% if nb > 0 %}
+            <div style="padding: 8px 0;text-align: center;">
+                {% set display = 0 %}
+                {% for ph in p.photos %}
+                    {% if ph.selected and display < 3 and file_exists(dir ~ "/public/media/cache/my_thumb/uploads/photos/" ~ ph.slug ~ "." ~ ph.extension) %}
+                        <img src="{{ asset("/uploads/photos/" ~ ph.slug ~ "." ~ ph.extension)|imagine_filter('my_thumb') }}" style="width: 32.8%;padding: 0;margin: 0;border:0;"/>
+                    {% endif %}
+                    {% set display = display + 1 %}
+                {% endfor %}
+            </div>
+        {% endif %}  
+        <div style="padding-top: 8px;padding-bottom: 7px;color: #94b7bc;text-transform: uppercase;font-size: 0.8rem;">Présentation</div>
+        <div style="font-size: 12px;text-align: justify">{{ p.webTexte|nl2br }}</div>
+        {% if p.extensions and p.extensions is not empty %}
+        <div style="padding-top: 30px;padding-bottom: 7px;color: #94b7bc;text-transform: uppercase;font-size: 0.8rem;">Extensions</div>
+        <div style="font-size: 12px;padding-bottom: 8px;">
+                <div style="padding-bottom: 5px;">
+                    {% for e in p.extensions %}
+                        Une extension d'allocation d'un montant de {{ e.amount|number_format(0, '.', ' ') }} € a été allouée à la date du {{ e.dateSign|date('d/m/Y') }}.<br>
+                    {% endfor %}
+                </div>
+            
+            {#
+            {% if p.status == 'configuration' %}
+                Mise au point des modalités d'éxécution avant début du projet.
+            {% elseif p.status == 'finished' %}
+                Projet terminé en {{ p.dateEnd|format_datetime(locale='fr',pattern="MMMM YYYY") }}.
+            {% else %}
+                Le projet est en cours depuis {{ p.dateBegin|format_datetime(locale='fr',pattern="MMMM YYYY") }} et il devrait se terminer en {{ p.dateEnd|format_datetime(locale='fr',pattern="MMMM YYYY") }}.
+            {% endif %}
+            #}
+        </div>
+        {% endif %}
+
+    {% endfor %}

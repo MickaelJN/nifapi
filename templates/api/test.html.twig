@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Outils de test</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+        <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <style>
+            .example-wrapper { margin: 1em auto; max-width: 1200px; width: 95%; font: 18px/1.5 sans-serif; }
+            .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+            button{font-size: 16px;font-weight: bold}
+            h2{font-size: 20px;color: #4F798B;}
+            #dateCourante{font-size:30px;font-weight: bold;}
+            table{width: 100%; border-collapse: collapse;margin-top: 20px}
+            table td{text-align: left; border-top: 2px solid #E1E1E1;padding: 8px 0; font-size: 16px;}
+            th{font-size: 13px;text-transform: uppercase;}
+            hr{height: 3px;background: #4F798B80;border: none;}
+            .userRight{color: green; font-weight: bold;text-align: center;font-size: 20px}
+            .association{font-size: 13px;font-weight: bold;color: #919191}
+        </style>
+
+        <div class="example-wrapper">
+            <h1 style="text-align:center">Outils de test</h1>
+            <hr>
+            <div style="padding: 40px 0; text-align: center">
+                <h2>La date dans la plateforme est actuellement</h2>
+                <div id="dateCourante" style="margin-top: 10px; margin-bottom: 0;"></div>
+                <div style="font-size:12px; padding-top:10px">Rafraichissement : <span id="dateReal"></span></div>
+            </div>
+            <hr>
+            <div style="padding: 40px 0; text-align: center">
+                <h2>Faire avancer la date de test</h2>
+                <div id="linkChange"></div>
+            </div>
+            <hr>
+            <div style="padding: 40px 0; text-align: center">
+                <h2>Liste des administrateurs</h2>
+                <div>
+                    <table id="admin"></table>
+                </div>
+            </div>
+            <hr>
+            <div style="padding: 40px 0; text-align: center">
+                <h2>Liste des membres d'association</h2>
+                <div>
+                    <table id="contact"></table>
+                </div>
+            </div>
+        </div>
+        <script>
+
+            var dayCourant = 0;
+            var loading = false;
+
+            $(function () {
+                refreshData(true);
+
+                $("body").on("click", "#linkChangeTo14", function () {
+                    console.log("jump14");
+                    jumpTo(14);
+                });
+
+                $("body").on("click", "#linkChangeTo5", function () {
+                    console.log("jump5");
+                    jumpTo(5);
+                });
+
+            });
+
+
+            function refreshData(refresh) {
+                $.ajax({
+                    url: "testApi",
+                    cache: false,
+                    dataType: 'json',
+                }).done(function (data) {
+                    dayCourant = data.dateCourante.split("/")[0];
+                    $("#dateCourante").html(data.dateCourante);
+                    $("#dateReal").html(lastRefreshDate());
+                    listAdmin(data.admins);
+                    listContact(data.contacts);
+                }).always(function () {
+                    if(refresh){setTimeout(function(){refreshData(true)}, 5000);}
+                    linkChangeDate(loading);
+                });
+            }
+
+            function listAdmin(admins) {
+                var html = "<tr><th></th><th>Admin</th><th>Président</th><th>Secretaire</th><th>Support</th></tr>";
+                admins.forEach(function (user) {
+                    html += "<tr>";
+                    html += "<td><strong>" + user.lastname + " " + user.firstname + "</strong><br><i style='font-size:15px'>" + user.email + "</i></strong</td>";
+                    html += "<td class='userRight'>" + (user.isAdmin ? "X" : "") + "</td>";
+                    html += "<td class='userRight'>" + (user.isPresident ? "X" : "") + "</td>";
+                    html += "<td class='userRight'>" + (user.isSecretariat ? "X" : "") + "</td>";
+                    html += "<td class='userRight'>" + (user.isSecretariatSupport ? "X" : "") + "</td>";
+                    html += "</tr>";
+                });
+                $("#admin").html(html);
+            }
+
+            function listContact(contacts) {
+                var html = "<tr><th style='text-align: left'>Association</th><th style='text-align: left'>Utilisateur</th><th>Representant</th></tr>";
+                contacts.forEach(function (user) {
+                    html += "<tr>";
+                    html += "<td class='association'>" + user.organization + "</td>";
+                    html += "<td><strong>" + user.lastname + " " + user.firstname + "</strong><br><i style='font-size:15px'>" + user.email + "</i></strong</td>";
+                    html += "<td class='userRight'>" + (user.isRepresentative ? "X" : "") + "</td>";
+                    html += "</tr>";
+                });
+                $("#contact").html(html);
+            }
+
+
+            function linkChangeDate(load) {
+                if (load) {
+                    $("#linkChange").html("...chargement en cours...");
+                } else {
+                    if (dayCourant < 14) {
+                        $("#linkChange").html("<button id='linkChangeTo14'>Passer au 14 du mois et générer le transfert du mois</Button><div style='color: red; padding-top: 10px; font-size: 14px;font-weight: bold;'>Il faut valider les reçus d'abord, envoyer et valider les rapports, vérifier les RIB, valider des factures... sinon le transfert sera vide</div>");
+                    } else if (dayCourant == 14) {
+                        $("#linkChange").html("<button disabled>Vous devez confirmer l'exécution des virements du mois pour avancer dans le temps</Button>");
+                    } else {
+                        $("#linkChange").html("<button id='linkChangeTo5'>Passer au début du mois suivant (demande de rapport intermédiaire ou final si besoin)</Button>");
+                    }
+                }
+            }
+
+            function lastRefreshDate() {
+                var date = new Date();
+                var current_date = date.getDate() + "/"
+                        + (date.getMonth() + 1) + "/"
+                        + date.getFullYear() + " à "
+                        + date.getHours() + ":"
+                        + (date.getMinutes() < 10 ? '0' : '')
+                        + date.getMinutes() + ":"
+                        + (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+                return current_date;
+            }
+
+            function jumpTo(day) {
+                console.log("jump");
+                loading = true;
+                linkChangeDate(true);
+                $.ajax({
+                    url: "jump"+day,
+                    cache: false,
+                    dataType: 'json',
+                }).always(function () {
+                    loading = false;
+                    linkChangeDate(false);
+                    refreshData(false);
+                });
+            }
+        </script>
+    </body>
+</html>

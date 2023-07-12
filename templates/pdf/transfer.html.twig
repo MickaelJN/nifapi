@@ -1,0 +1,30 @@
+<h1 style="text-align: center;">Fondation NIF - Versements {{ transfer.month }}/{{ transfer.year }}</h1>
+<table width="100%" style="font-size: 14px;margin-bottom: 30px;">
+    <tr>
+        <td style="font-weight: bold;">
+            TOTAL : {{ transfer.amount|number_format(2, '.', ' ') }} €
+        </td>
+        <td style="text-align:right">
+            {% if transfer.dateExecution %}Versement exécuté le {{ transfer.dateExecution|date("d/m/Y") }}{% endif %}
+        </td>
+    </tr>
+</table>
+{% for payment in transfer.payments %}
+    <table width="100%" style="font-size: 14px;line-height: 19px;">
+        <tr>
+            <td>
+                <div><strong>{{ payment.project.organization.name }}</strong></div>
+                <div><i>{{ payment.project.name }} ({{ payment.project.number }})</i></div>
+                <div>
+                    {% if payment.ribData %}
+                        {{ payment.ribData.iban|u.wordwrap(4, " ", 1) }}
+                    {% else %}
+                        {{ payment.project.organization.rib.iban|u.wordwrap(4, " ", 1) }} (à verifier)
+                    {% endif %}
+                </div>
+                <div><strong>{{ payment.amount|number_format(2, '.', ' ') }} €</strong></div>
+                {% if loop.last != true %}<hr>{% endif %}
+            </td>
+        </tr>
+    </table>
+{% endfor %}

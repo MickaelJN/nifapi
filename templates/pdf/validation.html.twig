@@ -1,0 +1,99 @@
+<table width="100%" style="font-size: 13px;padding-top: 140px;">
+    <tr>
+        <td width="52%"></td>
+        <td width="48%">
+            <strong>
+                Par courriel
+            </strong>
+            <br><br>
+            <strong>
+                {{ project.initialAllocated.data.organization.name }}
+                {% if project.initialAllocated.data.organization.legalStatus and project.initialAllocated.data.organization.legalStatus != "" %}
+                    {{ project.initialAllocated.data.organization.legalStatus }}
+                {% endif %}
+            </strong>
+            <br>
+            {{ project.initialAllocated.data.organization.address }}
+            <br>
+            {{ project.initialAllocated.data.organization.zipcode }} {{ project.initialAllocated.data.organization.city }}
+            <br>
+            {{ project.initialAllocated.data.organization.country}}
+        </td>
+    </tr>
+    <tr>
+        <td width="58%"></td>
+        <td width="42%" style="padding-top: 17px;">
+            Luxembourg, le {{ project.initialAllocated.dateSign|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}
+        </td>
+    </tr>
+</table>
+<table width="100%" style="font-size: 12px;padding-top: 60px;text-align: justify;">
+    <tr>
+        <td style="padding-bottom: 25px;text-decoration: underline;">
+            <strong>A l’attention de {{ (project.initialAllocated.data.representant.gender == 1)? "Monsieur" : "Madame" }} {{ project.initialAllocated.data.representant.firstname }} {{ project.initialAllocated.data.representant.lastname|upper }}, {{ project.initialAllocated.data.representant.position|capitalize }},</strong>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 25px;">
+            {{ (project.initialAllocated.data.representant.gender == 1)? "Monsieur le" : "Madame la" }} {{ project.initialAllocated.data.representant.position|capitalize }}, 
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p>Votre projet « <em><strong>{{ project.initialAllocated.data.project.name }}</strong></em> » a été sélectionné lors de la session du {{ project.initialAllocated.dateAllocated|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}.</p>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top: 12px;">
+            <p>Nous vous en félicitons et sommes heureux de pouvoir contribuer à sa réalisation en vous confirmant qu’une allocation de <strong>{{ project.initialAllocated.amount|number_format(0, '.', ' ') }} EUR</strong> a été attribuée à ce projet.</p>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top: 12px;">
+            <p>Les modalités d’attribution seront mises au point prochainement avec vous.</p>
+        </td>
+    </tr>
+    {% if project.initialAllocated.note %}
+        <tr>
+            <td style="padding-top: 12px;">
+                <p>{{ project.initialAllocated.note }}</p>
+            </td>
+        </tr>
+    {% endif %}
+    <tr>
+        <td style="padding-top: 12px;">
+            <p>Ce projet sera repris sur notre site www.fondation-nif.com qui mentionnera son stade d’avancement, régulièrement mis à jour (<strong>projet n°{{ project.initialAllocated.data.project.number }}</strong>).</p>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top: 12px;">
+            <p>Nous souhaitons qu’il se déroule sous les meilleures conditions.</p>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top: 12px;">
+            <p>Recevez, {{ (project.initialAllocated.data.representant.gender == 1)? "Monsieur" : "Madame" }}, l’expression de nos meilleures salutations.</p>
+        </td>
+    </tr>
+
+</table>
+<table width="100%" style="text-align:center;padding-top: 40px;font-size: 12px;">
+    {% if project.initialAllocated.dateSign is null %}
+        <tr>
+            <td style="padding-top: 70px;">
+
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td style="padding-top: 30px;">
+                <img src="uploads/files/{{ project.initialAllocated.data.president.sign }}" style="max-width: 130px;"/>
+            </td>
+        </tr>
+    {% endif %}
+    <tr>
+        <td style="padding-top: 5px;">
+            <strong>{{ project.initialAllocated.data.president.firstname~" "~project.initialAllocated.data.president.lastname }}</strong><br><em>{{ project.initialAllocated.data.president.position }}</em>
+        </td>
+    </tr>
+</table>

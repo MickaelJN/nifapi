@@ -1,0 +1,43 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    fakedate: 1
+    uploadfile_directory_root: '%kernel.project_dir%/public/uploads/files'
+    uploadphoto_directory_root: '%kernel.project_dir%/public/uploads/photos'
+    backup_directory: '%kernel.project_dir%/public/backup'
+    document_directory: '%kernel.project_dir%/public/docs'
+    filename_validation: 'NIF-validation-P'
+    filename_extension: 'NIF-extension-P'
+    plateforme_url: 'http://localhost:3030/'
+    site_wp: 'https://nifdemo.web-plus-sucre.fr/'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    acme_api.event.jwt_created_listener:
+        class: App\EventListener\JWTCreatedListener
+        arguments: [ '@request_stack' ]
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
+            
+    app.mpdf:
+        class: App\Service\MPdfService
+        public: true
+        autowire: true

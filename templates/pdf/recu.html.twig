@@ -1,0 +1,58 @@
+<table width="100%" style="font-size: 13px;">
+    <tr>
+        <td style="padding-bottom: 45px">
+            <strong>
+                DE {{ payment.project.organization.name }} 
+                {% if payment.project.organization.legalStatus and payment.project.organization.legalStatus != "" %}
+                    ({{ payment.project.organization.legalStatus }})
+                {% endif %}
+            </strong>
+            <br/>
+            Ayant son siège social 
+            {{ payment.project.organization.headquarterAddress }}, {{ payment.project.organization.headquarterZipcode }} {{ payment.project.organization.headquarterCity }}, {{ payment.project.organization.headquarterCountry.name }}
+            <br/>Ci-après appelé "L'Association".
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-bottom: 120px">
+            <strong>A la Fondation NIF pour l'Aide aux Projets Humanitaires</strong>
+            <br/>
+            Ayant son siège social rue Guillaume Kroll, 12E, L-1882 Luxembourg
+            <br/>Ci-après appelée "la Fondation NIF"
+        </td>
+    </tr>
+    <tr style="padding-bottom: 45px"> 
+        <td style="color: #000; width: 100%;font-weight: bolder;padding: 5px; font-size: 16px;text-align: center;font-weight: bold;">
+            CONFIRMATION de RECEPTION – RECU n° {{ payment.datePayment|date("Y-m-d")  }}
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-top: 45px;text-align: center;'>
+            Le soussigné reconnait avoir reçu de la Fondation NIF pour l’Aide aux Projets Humanitaires
+        </td>
+    </tr>
+    <tr>
+        <td style='padding-top: 45px;text-align: center; font-weight: bold;'>
+            Une allocation d'un montant de EUR {{ payment.amount }}
+            <br>
+            pour le projet "{{ payment.project.name }}".
+        </td>
+    </tr>
+    <tr>
+        <td style="padding-top: 45px;text-align: justify;">
+            Le soussigné accepte et s’engage, par la remise de l’allocation précitée, à respecter toutes les lois ou directives (y compris les lois fiscales), obligations légales, administratives ou de toutes autres natures découlant de la législation de son pays de résidence fiscale ou de celle de la source de l’allocation et qui seraient liées directement ou indirectement à l’attribution de la présente allocation.<br/><br/>
+            Le soussigné accepte et s’engage, par la remise de l’allocation précitée, à respecter les conditions générales de la Fondation NIF et en particulier les dispositions relatives à la destination des fonds alloués par la présente allocation. En cas de non-respect de ces conditions, le soussigné s’engage à restituer l’allocation précitée à première demande à la Fondation NIF.<br/><br/>
+            En cas de non-respect des conditions générales de la Fondation NIF ou des engagements ci-dessus, le soussigné s’engage à indemniser la Fondation NIF de tout dommage quel qu’il soit consécutif à toute action, plainte ou à toute autre exigence légale ou administrative résultant de ce non-respect et qui serait dirigée ou qui pourrait être dirigée contre la Fondation NIF, ainsi que de tout coût ou dépense y relative.
+        </td>
+    </tr>
+    {% if payment.receiptValidDate and payment.receiptData %}
+        <tr>
+            <td style="padding-top: 120px;text-align: center;font-weight: bold">
+                <strong>Approuvé le {{ payment.receiptValidDate|date('Y-m-d à H:i')}} au nom et pour compte de l'Association par</strong>
+                <br><br>
+                {{ payment.receiptData.firstname }} {{ payment.receiptData.lastname }}<br>
+                {{ payment.receiptData.position }}
+            </td>
+        </tr>    
+    {% endif %}
+</table>

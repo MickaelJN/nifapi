@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Document xmlns='urn:iso:std:iso:20022:tech:xsd:pain.001.001.03' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+    <CstmrCdtTrfInitn>
+        <GrpHdr>
+            <MsgId>{{ transfer.year }}-{{ transfer.month }}-{{ "now"|date("Y-m-d H:i:s") }}</MsgId>
+            <CreDtTm>{{ "now"|date("Y-m-d") }}T{{ "now"|date("H:i:s") }}</CreDtTm>
+            <NbOfTxs>{{ nb }}</NbOfTxs>
+            <CtrlSum>{{ amount }}</CtrlSum>
+            <InitgPty>
+                <Nm>Fondation-NIF</Nm>
+            </InitgPty>
+        </GrpHdr>
+        <PmtInf>
+            <PmtInfId>{{ transfer.year }}-{{ transfer.month }}</PmtInfId>
+            <PmtMtd>TRF</PmtMtd>
+            <BtchBookg>false</BtchBookg>
+            <NbOfTxs>{{ nb }}</NbOfTxs>
+            <CtrlSum>{{ amount }}</CtrlSum>
+            <PmtTpInf>
+                <InstrPrty>NORM</InstrPrty>
+                    {% if isSepa %}
+                    <SvcLvl>
+                        <Cd>SEPA</Cd>
+                    </SvcLvl>
+                {% endif %}
+            </PmtTpInf>
+            <ReqdExctnDt>{{ transfer.dateExecution|date("Y-m-d") }}</ReqdExctnDt>
+            <Dbtr>
+                <Nm>Fondation-NIF</Nm>
+                <PstlAdr>
+                    <Ctry>LU</Ctry>
+                    <AdrLine>12E Rue G Kroll</AdrLine>
+                    <AdrLine>L-1882 Luxembourg</AdrLine>
+                </PstlAdr>
+            </Dbtr>
+            <DbtrAcct>
+                <Id>
+                    <IBAN>LU660080356250102001</IBAN>
+                </Id>
+                <Ccy>EUR</Ccy>
+            </DbtrAcct>
+            <DbtrAgt>
+                <FinInstnId>
+                    <BIC>BLUXLULL</BIC>
+                </FinInstnId>
+            </DbtrAgt>
+            <ChrgBr>{% if isSepa %}SLEV{% else %}SHAR{% endif %}</ChrgBr>
+                {% for payment in transfer.payments %}
+                    {% if (isSepa and payment.project.organization.rib.isSepa) or (isSepa == false and payment.project.organization.rib.isSepa == false) %}
+                    <CdtTrfTxInf>
+                        <PmtId>
+                            <EndToEndId>{{ payment.id|replace({'-': ""}) }}</EndToEndId>
+                        </PmtId>
+                        <Amt>
+                            <InstdAmt Ccy='EUR'>{{ payment.amount }}</InstdAmt>
+                        </Amt>
+                        <CdtrAgt>
+                            <FinInstnId>
+                                <BIC>{{ payment.project.organization.rib.bic }}</BIC>
+                                    {% if payment.project.organization.rib.bank %}
+                                    <Nm>{{ payment.project.organization.rib.bank }}</Nm>
+                                    {% endif %}
+                                    {% if payment.ribData.address or payment.ribData.country %}
+                                    <PstlAdr>
+                                        {% if payment.ribData.country %}
+                                            <Ctry>{{ payment.ribData.country.isocode2 }}</Ctry>
+                                            {% endif %}
+                                            {% if payment.ribData.address %}
+                                            <AdrLine>{{ payment.ribData.address|remove_accent|slice(0, 70) }}</AdrLine>
+                                            {% endif %}
+                                    </PstlAdr>
+                                {% endif %}
+                            </FinInstnId>
+                        </CdtrAgt>
+                        <Cdtr>
+                            <Nm>{{ (payment.project.organization.name~" "~payment.project.organization.legalStatus)|remove_accent|slice(0, 70) }}</Nm>
+                            <PstlAdr>
+                                <Ctry>{{ payment.project.organization.headquarterCountry.isocode2 }}</Ctry>
+                                    {% if payment.project.organization.headquarterAddress %}
+                                    <AdrLine>{{ payment.project.organization.headquarterAddress|remove_accent|slice(0, 70) }}</AdrLine>
+                                    {% endif %}
+                                <AdrLine>{{ (payment.project.organization.headquarterZipcode~" "~payment.project.organization.headquarterCity)|remove_accent|slice(0, 70) }}</AdrLine>
+                            </PstlAdr>
+                        </Cdtr>
+                        <CdtrAcct>
+                            <Id>
+                                {% if isSepa %}
+                                    <IBAN>{{ payment.ribData.iban }}</IBAN>
+                                    {% else %}
+                                    <Othr>
+                                        <Id>{{ payment.ribData.iban }}</Id>
+                                    </Othr>
+                                {% endif %}
+                            </Id>
+                        </CdtrAcct>
+                        <RmtInf>
+                            <Ustrd>P{{ payment.id }}D{{ transfer.dateExecution|date("Y-m-d")}}A{{ payment.amount }}</Ustrd>
+                        </RmtInf>
+                    </CdtTrfTxInf>
+                {% endif %}
+            {% endfor %}
+        </PmtInf>
+    </CstmrCdtTrfInitn>
+</Document>

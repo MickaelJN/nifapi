@@ -1,0 +1,116 @@
+<table width="100%" style="font-size: 13px;padding-top: 140px;">
+    <tr>
+        <td width="52%"></td>
+        <td width="48%">
+            <strong>
+                Par courriel
+            </strong>
+            <br><br>
+            <strong>
+                {{ extension.data.organization.name }}
+				{% if extension.data.organization.legalStatus and extension.data.organization.legalStatus != "" %}
+                    {{ extension.data.organization.legalStatus }}
+                {% endif %}
+            </strong>
+            <br>
+            {{ extension.data.organization.address }}
+            <br>
+            {{ extension.data.organization.zipcode }} {{ extension.data.organization.city }}
+            <br>
+            {{ extension.data.organization.country}}
+        </td>
+    </tr>
+    <tr>
+        <td width="58%"></td>
+        <td width="42%" style="padding-top: 17px;">
+            Luxembourg, le {{ extension.dateSign|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}
+        </td>
+    </tr>
+</table>
+<table width="100%" style="font-size: 12px;padding-top: 60px;text-align: justify;">
+    <tr>
+        <td style="padding-bottom: 25px;text-decoration: underline;">
+            <strong>A l’attention de {{ (extension.data.representant.gender == 1)? "Monsieur" : "Madame" }} {{ extension.data.representant.firstname }} {{ extension.data.representant.lastname|upper }}, {{ extension.data.representant.position|capitalize }},</strong>
+        </td>
+    </tr>
+</table>
+<table width="100%" style="font-size: 12px;text-align: justify;padding-bottom: 12px;">
+    <tr>
+        <td style="padding-bottom: 25px;">
+            {{ (extension.data.representant.gender == 1)? "Monsieur le" : "Madame la" }} {{ extension.data.representant.position|capitalize }}, 
+        </td>
+    </tr>
+</table>
+<table width="100%" style="font-size: 12px;text-align: justify;padding-bottom: 12px;">
+    <tr>
+        <td>
+            <p>Votre demande d'extension de l'allocation accordée dans le cadre du projet « <em><strong>{{ extension.data.project.name }}</strong></em> » , nous est bien parvenue.</p>
+        </td>
+    </tr>
+</table>
+<table width="100%" style="font-size: 12px;text-align: justify;padding-bottom: 12px;">
+    <tr>
+        <td>
+            <p>Après examen, les membres de notre Conseil d'Administration ont pris, en date du {{ extension.dateAllocated|format_datetime(locale='fr',pattern="dd MMMM YYYY") }}, la décision d'attribuer une allocation complémentaire d'un montant de <strong>{{ extension.amount|number_format(0, '.', ' ') }} EUR</strong>.</p>
+        </td>
+    </tr>
+</table>
+{% if extension.data.cause is defined %}
+    <table width="100%" style="font-size: 12px;text-align: justify; padding-bottom: 12px;">
+        <tr>
+            <td>
+                <p>{{ extension.data.cause }}</p>
+            </td>
+        </tr>
+    </table>
+{% endif %}
+{% if extension.note %}
+    <table width="100%" style="font-size: 12px;text-align: justify;padding-bottom: 12px;">
+        <tr>
+            <td>
+                <p>{{ extension.note }}</p>
+            </td>
+        </tr>
+    </table>
+{% endif %}
+<table width="100%" style="font-size: 12px;text-align: justify;padding-bottom: 12px;">
+    <tr>
+        <td>
+            <p>Les modalités d’attribution seront mises au point prochainement avec vous.</p>
+        </td>
+    </tr>
+</table>
+<table width="100%" style="font-size: 12px;text-align: justify;padding-bottom: 12px;">
+    <tr>
+        <td>
+            <p>Ce projet sera repris sur notre site www.fondation-nif.com qui mentionnera son stade d’avancement, régulièrement mis à jour (<strong>projet n° {{ extension.data.project.number }}</strong>).</p>
+        </td>
+    </tr>
+</table>
+<table width="100%" style="font-size: 12px;text-align: justify;padding-bottom: 12px;">
+    <tr>
+        <td>
+            <p>Recevez, {{ (extension.data.representant.gender == 1)? "Monsieur" : "Madame" }}, l’expression de nos meilleures salutations.</p>
+        </td>
+    </tr>
+</table>
+<table width="100%" style="text-align:center;padding-top: 40px;font-size:12px">
+    {% if extension.dateSign is null %}
+        <tr>
+            <td style="padding-top: 40px;">
+
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td style="padding-top: 30px;">
+                <img src="uploads/files/{{ extension.data.president.sign }}" style="max-width: 200px;"/>
+            </td>
+        </tr>
+    {% endif %}
+    <tr>
+        <td style="padding-top: 5px;">
+            <strong>{{ extension.data.president.firstname~" "~extension.data.president.lastname }}</strong><br><em>{{ extension.data.president.position }}</em>
+        </td>
+    </tr>
+</table>
